@@ -950,43 +950,6 @@ dotnet test
 dotnet run --project SmartCrowd.Core.csproj
 ```
 
-## Тестирование
-
-```bash
-# Запуск всех тестов
-dotnet test
-
-# Запуск тестов с покрытием
-dotnet test --collect:"XPlat Code Coverage"
-
-# Запуск конкретного теста
-dotnet test --filter "FullyQualifiedName~TestName"
-```
-
-## Вклад в проект
-
-1. **Fork** репозитория
-2. Создайте **feature branch** (`git checkout -b feature/AmazingFeature`)
-3. **Commit** изменения (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** в branch (`git push origin feature/AmazingFeature`)
-5. Откройте **Pull Request**
-
-## Лицензия
-
-Этот проект лицензирован под MIT License - см. файл [LICENSE](LICENSE) для деталей.
-
-## Поддержка
-
-- **Issues**: [GitHub Issues](https://github.com/your-username/SmartCrowd/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/SmartCrowd/discussions)
-- **Wiki**: [GitHub Wiki](https://github.com/your-username/SmartCrowd/wiki)
-
-## Благодарности
-
-- Вдохновение: [GOAP (Goal-Oriented Action Planning)](https://alumni.media.mit.edu/~jorkin/goap.html)
-- Алгоритм A*: [Pathfinding](https://en.wikipedia.org/wiki/A*_search_algorithm)
-- Архитектурные паттерны: [Game Programming Patterns](https://gameprogrammingpatterns.com/)
-
 ## Roadmap
 
 ### Версия 1.0 (Текущая)
