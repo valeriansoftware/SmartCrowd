@@ -132,6 +132,7 @@ public class IntegratedScheduler
             var action = agentState.Actions.GetAction(entry.ActionName);
             if (action == null)
             {
+                Console.WriteLine($"  [DEBUG] Действие {entry.ActionName} не найдено");
                 _scheduleManager.MarkActionSkipped(entry.ActionName);
                 continue;
             }
@@ -142,6 +143,7 @@ public class IntegratedScheduler
                 var target = _world.GetEntityById(entry.TargetId);
                 if (target == null)
                 {
+                    Console.WriteLine($"  [DEBUG] Цель {entry.TargetId} не найдена");
                     _scheduleManager.MarkActionSkipped(entry.ActionName);
                     continue;
                 }
@@ -151,10 +153,12 @@ public class IntegratedScheduler
                 {
                     if (entry.RetryIfBusy)
                     {
+                        Console.WriteLine($"  [DEBUG] Цель {entry.TargetId} занята, будет повторная попытка");
                         _scheduleManager.MarkActionSkipped(entry.ActionName, wasBusy: true);
                     }
                     else
                     {
+                        Console.WriteLine($"  [DEBUG] Цель {entry.TargetId} занята, действие пропущено");
                         _scheduleManager.MarkActionSkipped(entry.ActionName);
                     }
                     continue;
@@ -163,29 +167,31 @@ public class IntegratedScheduler
                 // Устанавливаем цель
                 agentState.SetTarget(entry.TargetId);
                 
+                // Проверяем предусловия
+                if (!action.CanExecute(agentState, _world, target))
+                {
+                    Console.WriteLine($"  [DEBUG] Действие {entry.ActionName} не может быть выполнено (предусловия не выполнены)");
+                    _scheduleManager.MarkActionSkipped(entry.ActionName);
+                    continue;
+                }
+                
                 // Выполняем действие
                 var success = action.Execute(agentState, _world, target);
                 if (success)
                 {
+                    Console.WriteLine($"  [DEBUG] Действие {entry.ActionName} выполнено успешно");
                     _scheduleManager.MarkActionCompleted(entry.ActionName);
                 }
                 else
                 {
+                    Console.WriteLine($"  [DEBUG] Действие {entry.ActionName} не выполнено");
                     _scheduleManager.MarkActionSkipped(entry.ActionName);
                 }
             }
             else
             {
-                // Действие без цели
-                var success = action.Execute(agentState, _world, null!);
-                if (success)
-                {
-                    _scheduleManager.MarkActionCompleted(entry.ActionName);
-                }
-                else
-                {
-                    _scheduleManager.MarkActionSkipped(entry.ActionName);
-                }
+                // Действие без цели - пропускаем
+                _scheduleManager.MarkActionSkipped(entry.ActionName);
             }
         }
         

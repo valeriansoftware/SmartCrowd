@@ -9,6 +9,7 @@ public class ScheduleManager
     private readonly List<ScheduleEntry> _schedule = new();
     private readonly Dictionary<string, int> _retryCounts = new(StringComparer.Ordinal);
     private readonly Dictionary<string, TimeSpan> _lastRetryTimes = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _completedActions = new(StringComparer.Ordinal); // Добавляем отслеживание выполненных действий
     
     public bool IsActive { get; private set; } = true;
     public TimeSpan CurrentTime { get; private set; } = TimeSpan.Zero;
@@ -88,6 +89,12 @@ public class ScheduleManager
             return false;
         }
         
+        // Проверяем, было ли действие уже выполнено
+        if (_completedActions.Contains(entry.ActionName))
+        {
+            return false;
+        }
+        
         var retryCount = _retryCounts.GetValueOrDefault(entry.ActionName, 0);
         var lastRetryTime = _lastRetryTimes.GetValueOrDefault(entry.ActionName, TimeSpan.MinValue);
         
@@ -111,6 +118,7 @@ public class ScheduleManager
     {
         _retryCounts.Remove(actionName);
         _lastRetryTimes.Remove(actionName);
+        _completedActions.Add(actionName); // Отмечаем как выполненное
         
         var entry = _schedule.FirstOrDefault(e => string.Equals(e.ActionName, actionName, StringComparison.OrdinalIgnoreCase));
         if (entry != null)
@@ -158,6 +166,16 @@ public class ScheduleManager
     public void Resume()
     {
         IsActive = true;
+    }
+    
+    /// <summary>
+    /// Сбрасывает выполненные действия (для начала нового дня)
+    /// </summary>
+    public void ResetCompletedActions()
+    {
+        _completedActions.Clear();
+        _retryCounts.Clear();
+        _lastRetryTimes.Clear();
     }
     
     /// <summary>

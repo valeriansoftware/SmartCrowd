@@ -21,6 +21,12 @@ public static class ExampleSchedules
                 RetryIfBusy = false
             },
             
+            new ScheduleEntry(new TimeSpan(9, 0, 0), "ChopWood", "tree_01")
+            {
+                IsInterruptible = false,
+                RetryIfBusy = false
+            },
+            
             new ScheduleEntry(new TimeSpan(10, 0, 0), "EatLunch", "table_01")
             {
                 IsInterruptible = true,
@@ -34,6 +40,12 @@ public static class ExampleSchedules
                 RetryIfBusy = false
             },
             
+            new ScheduleEntry(new TimeSpan(13, 0, 0), "ChopWood", "tree_02")
+            {
+                IsInterruptible = false,
+                RetryIfBusy = false
+            },
+            
             new ScheduleEntry(new TimeSpan(14, 0, 0), "Trade", "trader_01")
             {
                 IsInterruptible = true,
@@ -42,6 +54,12 @@ public static class ExampleSchedules
             },
             
             new ScheduleEntry(new TimeSpan(16, 0, 0), "ChopWood", "tree_03")
+            {
+                IsInterruptible = false,
+                RetryIfBusy = false
+            },
+            
+            new ScheduleEntry(new TimeSpan(18, 0, 0), "ChopWood", "tree_03")
             {
                 IsInterruptible = false,
                 RetryIfBusy = false

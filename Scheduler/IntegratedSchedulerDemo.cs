@@ -14,46 +14,6 @@ public static class IntegratedSchedulerDemo
         // Создаем мир
         var world = new InMemoryWorldAdapter();
         
-        // Создаем агента
-        var agent = new AgentState("farmer_001");
-        agent.SetStat("hunger", 50);
-        agent.SetStat("energy", 80);
-        agent.SetStat("level", 1);
-        agent.SetStat("questActive", 0);
-        agent.SetStat("inCombat", 0);
-        agent.SetStat("wantsToTrade", 0);
-        agent.SetStat("socialNeed", 30);
-        agent.SetStat("craftingSkill", 5);
-        
-        agent.AddItem("axe", 1);
-        agent.AddItem("gold", 20);
-        
-        // Создаем интегрированный планировщик
-        var scheduler = new IntegratedScheduler(world);
-        agent.Scheduler = scheduler;
-        
-        // Регистрируем действия
-        agent.Actions.Register(ExampleActions.CreateChopTreeAction());
-        agent.Actions.Register(ExampleActions.CreateTradeAction());
-        agent.Actions.Register(ExampleActions.CreateOpenDoorAction());
-        
-        // Добавляем цели для GOAP
-        scheduler.AddGoal(ExampleGoals.CreateGatherWoodGoal());
-        scheduler.AddGoal(ExampleGoals.CreateGetFoodGoal());
-        scheduler.AddGoal(ExampleGoals.CreateRestGoal());
-        
-        // Устанавливаем расписание
-        var schedule = ExampleSchedules.CreateFarmerSchedule();
-        scheduler.SetSchedule(schedule);
-        
-        // Регистрируем сценарии
-        scheduler.RegisterScenario(ExampleScenarios.CreateIntroScene());
-        scheduler.RegisterScenario(ExampleScenarios.CreateQuestSequence());
-        scheduler.RegisterScenario(ExampleScenarios.CreateCombatSequence());
-        scheduler.RegisterScenario(ExampleScenarios.CreateTradeSequence());
-        scheduler.RegisterScenario(ExampleScenarios.CreateSocialSequence());
-        scheduler.RegisterScenario(ExampleScenarios.CreateCraftingSequence());
-        
         // Создаем объекты в мире
         var table = new Entity("table_01");
         table.Tags.Add("table");
@@ -78,6 +38,7 @@ public static class IntegratedSchedulerDemo
         bed.Tags.Add("bed");
         bed.Tags.Add("resting");
         
+        // Добавляем объекты в мир
         world.UpdateEntity(table);
         world.UpdateEntity(tree1);
         world.UpdateEntity(tree2);
@@ -85,12 +46,63 @@ public static class IntegratedSchedulerDemo
         world.UpdateEntity(trader);
         world.UpdateEntity(bed);
         
+        // Создаем агента
+        var agent = new AgentState("farmer_001");
+        agent.SetStat("hunger", 50);
+        agent.SetStat("energy", 80);
+        agent.SetStat("level", 1);
+        agent.SetStat("questActive", 0);
+        agent.SetStat("inCombat", 0);
+        agent.SetStat("wantsToTrade", 0);
+        agent.SetStat("socialNeed", 30);
+        agent.SetStat("craftingSkill", 5);
+        
+        agent.AddItem("axe", 1);
+        agent.AddItem("gold", 20);
+        
+        // Регистрируем действия
+        agent.Actions.Register(ExampleActions.CreateChopTreeAction());
+        agent.Actions.Register(ExampleActions.CreateTradeAction());
+        agent.Actions.Register(ExampleActions.CreateOpenDoorAction());
+        agent.Actions.Register(ExampleActions.CreateEatBreakfastAction());
+        agent.Actions.Register(ExampleActions.CreateEatLunchAction());
+        agent.Actions.Register(ExampleActions.CreateEatDinnerAction());
+        agent.Actions.Register(ExampleActions.CreateRestAction());
+        
+        // Создаем интегрированный планировщик
+        var scheduler = new IntegratedScheduler(world);
+        agent.Scheduler = scheduler;
+        
+        // Добавляем цели для GOAP
+        scheduler.AddGoal(ExampleGoals.CreateGatherWoodGoal());
+        scheduler.AddGoal(ExampleGoals.CreateGetFoodGoal());
+        scheduler.AddGoal(ExampleGoals.CreateRestGoal());
+        
+        // Устанавливаем расписание
+        var schedule = ExampleSchedules.CreateFarmerSchedule();
+        scheduler.SetSchedule(schedule);
+        
+        // Регистрируем сценарии
+        scheduler.RegisterScenario(ExampleScenarios.CreateIntroScene());
+        scheduler.RegisterScenario(ExampleScenarios.CreateQuestSequence());
+        scheduler.RegisterScenario(ExampleScenarios.CreateCombatSequence());
+        scheduler.RegisterScenario(ExampleScenarios.CreateTradeSequence());
+        scheduler.RegisterScenario(ExampleScenarios.CreateSocialSequence());
+        scheduler.RegisterScenario(ExampleScenarios.CreateCraftingSequence());
+        
         // Подписываемся на события
         scheduler.OnModeChanged += (mode) => Console.WriteLine($"Режим изменён: {mode}");
         scheduler.OnScheduleActionExecuted += (entry) => Console.WriteLine($"Расписание: выполнено {entry.ActionName}");
         
         // Демонстрируем работу по расписанию
         Console.WriteLine("=== Демонстрация работы по расписанию ===");
+        
+        // Отладочная информация
+        Console.WriteLine($"Доступные действия агента: {string.Join(", ", agent.Actions.GetAllActions().Select(a => a.Name))}");
+        Console.WriteLine($"Объекты в мире: {string.Join(", ", world.GetAllEntities().Select(e => $"{e.Id}({string.Join(",", e.Tags)})"))}");
+        Console.WriteLine($"Начальные статы: Голод={agent.GetStat("hunger")}, Энергия={agent.GetStat("energy")}");
+        Console.WriteLine();
+        
         var currentTime = new TimeSpan(6, 0, 0); // 6:00 утра
         
         for (int hour = 6; hour <= 22; hour++)
