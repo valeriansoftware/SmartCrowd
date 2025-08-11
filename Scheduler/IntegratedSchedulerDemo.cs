@@ -82,6 +82,26 @@ public static class IntegratedSchedulerDemo
         var schedule = ExampleSchedules.CreateFarmerSchedule();
         scheduler.SetSchedule(schedule);
         
+        // Устанавливаем начальное время для планировщика
+        scheduler.SetInitialTime(new TimeSpan(6, 0, 0));
+        
+        // Настраиваем правила изменения статов (опционально)
+        scheduler.ConfigureStatRule("hunger", new StatRule
+        {
+            ChangePerHour = 5,
+            MinValue = 0,
+            MaxValue = 100,
+            Description = "Голод увеличивается со временем"
+        });
+        
+        scheduler.ConfigureStatRule("energy", new StatRule
+        {
+            ChangePerHour = -2,
+            MinValue = 0,
+            MaxValue = 100,
+            Description = "Энергия уменьшается со временем"
+        });
+        
         // Регистрируем сценарии
         scheduler.RegisterScenario(ExampleScenarios.CreateIntroScene());
         scheduler.RegisterScenario(ExampleScenarios.CreateQuestSequence());

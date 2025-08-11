@@ -24,9 +24,9 @@ public class IntegratedScheduler
     private readonly ScenarioManager _scenarioManager;
     private readonly AgentPlanner _goapPlanner;
     private readonly IWorldAdapter _world;
+    private readonly AgentStatsManager _statsManager;
     
     private bool _isInGoapMode = false;
-    private TimeSpan _lastScheduleTime = TimeSpan.Zero;
     
     public event Action<string>? OnModeChanged;
     public event Action<ScheduleEntry>? OnScheduleActionExecuted;
@@ -38,6 +38,7 @@ public class IntegratedScheduler
         _scheduleManager = new ScheduleManager();
         _scenarioManager = new ScenarioManager();
         _goapPlanner = new AgentPlanner(world);
+        _statsManager = new AgentStatsManager();
         
         // Подписываемся на события
         _scheduleManager.OnActionCompleted += (entry) => OnScheduleActionExecuted?.Invoke(entry);
@@ -51,6 +52,22 @@ public class IntegratedScheduler
     public void SetSchedule(IEnumerable<ScheduleEntry> entries)
     {
         _scheduleManager.SetSchedule(entries);
+    }
+    
+    /// <summary>
+    /// Устанавливает начальное время для планировщика
+    /// </summary>
+    public void SetInitialTime(TimeSpan initialTime)
+    {
+        _statsManager.SetInitialTime(initialTime);
+    }
+    
+    /// <summary>
+    /// Настраивает правило изменения стата
+    /// </summary>
+    public void ConfigureStatRule(string statName, StatRule rule)
+    {
+        _statsManager.AddStatRule(statName, rule);
     }
     
     /// <summary>
@@ -74,6 +91,9 @@ public class IntegratedScheduler
     /// </summary>
     public bool Update(AgentState agentState, TimeSpan currentTime)
     {
+        // Автоматически обновляем статы агента со временем
+        _statsManager.UpdateStats(agentState, currentTime);
+        
         // Проверяем, нужно ли переключиться в GOAP-режим
         if (ShouldSwitchToGoap(agentState))
         {
@@ -94,6 +114,8 @@ public class IntegratedScheduler
             return ExecuteScheduleStep(agentState, currentTime);
         }
     }
+    
+
     
     /// <summary>
     /// Проверяет, нужно ли переключиться в GOAP-режим
